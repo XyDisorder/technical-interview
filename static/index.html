@@ -240,7 +240,20 @@
       populateMessage: '',
       populateMessageType: ''
     },
+    mounted () {
+      // Load games on component mount
+      this.loadGames()
+    },
     methods: {
+      loadGames () {
+        return axios.get(this.apiURL)
+          .then((response) => {
+            this.games = response.data
+          })
+          .catch((error) => {
+            console.error('Error loading games:', error)
+          })
+      },
       onAddOrUpdateGame (game) {
         if (game.id) {
           this.updateGame(game)
