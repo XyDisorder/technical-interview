@@ -35,7 +35,7 @@ For this feature, one PR split in 2 commit to be more readable ([feature](https:
 **Effort**: Medium
 
 
-
+--------------------------
 
 # Theory Questions - Answers / NEXT TECHNICAL STEPS TO IMPROVE
 
@@ -44,7 +44,9 @@ TLDR;
 
 **Question 2**: Implement event-driven architecture using S3 notifications → Lambda → API for real-time processing, or scheduled jobs for predictable batch processing. Add idempotency and monitoring for reliability.
 
-## Question 1: Production Readiness - Missing Pieces & Action Plan
+--------------------------
+
+# Question 1: Production Readiness - Missing Pieces & Action Plan
 
 ### Current State Analysis
 
@@ -52,7 +54,7 @@ The application has basic functionality but lacks several critical production-re
 
 ### Critical Missing Pieces
 
-#### 0. **Architecture Refactoring - Separation of Concerns**
+## 0. **Architecture Refactoring - Separation of Concerns**
 
 **Problem:**
 All application logic is in a single `index.js` file (151 lines). Routes, business logic, and database queries are all mixed together. This creates several issues:
@@ -123,7 +125,9 @@ const findAll = async () => {
 **Effort**: Medium (2-3 hours)
 **Impact**: High - Foundation for all future improvements. This refactoring makes all other improvements easier to implement.
 
-#### 1. **Database & Infrastructure**
+--------------------------
+
+### 1. **Database & Infrastructure**
 - **SQLite in production**: SQLite is not suitable for production with multiple concurrent users
 - **No connection pooling**: No database connection management
 - **No database backups**: No backup strategy
@@ -135,7 +139,9 @@ const findAll = async () => {
 - Set up automated daily backups
 - Create rollback procedures and test them
 
-#### 2. **Security**
+--------------------------
+
+### 2. **Security**
 - **No authentication/authorization**: API is completely open
 - **No HTTPS enforcement**: No SSL/TLS configuration
 - **No API keys or rate limiting per user**: Only global rate limiting
@@ -148,7 +154,9 @@ const findAll = async () => {
 - Add API key management for internal services
 - Security audit of all database queries
 
-#### 3. **Monitoring & Observability**
+--------------------------
+
+### 3. **Monitoring & Observability**
 - **No application monitoring**: No APM (Application Performance Monitoring)
 - **No error tracking**: Errors only logged to console
 - **No metrics collection**: No performance metrics
@@ -162,7 +170,9 @@ const findAll = async () => {
 - Set up metrics collection (Prometheus + Grafana)
 - Configure alerts for error rates, response times, database connections
 
-#### 4. **Scalability & Performance**
+--------------------------
+
+### 4. **Scalability & Performance**
 - **No caching**: Every request hits the database
 - **No pagination**: GET /api/games returns all games
 - **No database indexes**: Queries will slow down with data growth
@@ -176,7 +186,9 @@ const findAll = async () => {
 - Move static files to CDN (CloudFront, Cloudflare)
 - Design for stateless application (enables horizontal scaling)
 
-#### 5. **Configuration & Environment Management**
+--------------------------
+
+### 5. **Configuration & Environment Management**
 - **Hardcoded values**: Port, URLs hardcoded in code
 - **No environment-specific configs**: Same config for dev/staging/prod
 - **No secrets management**: Sensitive data in code/config files
@@ -187,17 +199,21 @@ const findAll = async () => {
 - Create separate config files per environment
 - Never commit secrets to version control
 
-#### 6. **Testing & Quality Assurance**
+### 6. **Testing & Quality Assurance**
 - **Limited test coverage**: Only basic unit and integration tests
 - **No E2E tests**: No end-to-end testing
 - **No load testing**: No performance testing
 - **No security testing**: No vulnerability scanning
 
+--------------------------
+
 **Action Plan:**
-- Increase test coverage to >80%
+- Increase test coverage to >80% (usefull only)
 - Add E2E tests for critical user flows
 - Implement load testing (k6, Artillery)
 - Regular security audits and dependency scanning
+
+--------------------------
 
 #### 7. **Deployment & CI/CD**
 - **No CI/CD pipeline**: Manual deployment
@@ -211,7 +227,9 @@ const findAll = async () => {
 - Implement deployment strategy (blue-green or canary)
 - Automated rollback on health check failures
 
-#### 8. **Documentation**
+--------------------------
+
+### 8. **Documentation**
 - **No API documentation**: No Swagger/OpenAPI spec
 - **No deployment documentation**: No runbooks
 - **No architecture documentation**: No system design docs
@@ -222,34 +240,36 @@ const findAll = async () => {
 - Document architecture and data flows
 - Maintain changelog
 
-### Prioritized Action Plan
+--------------------------
 
-**Phase 1: Critical (Week 1-2)**
+# Prioritized Action Plan
+
+**Phase 1: Critical **
 1. Migrate database to PostgreSQL
 2. Add environment variables and secrets management
 3. Implement health check endpoint
 4. Add basic monitoring (error tracking + metrics)
 
-**Phase 2: High Priority (Week 3-4)**
+**Phase 2: High Priority **
 5. Add authentication/authorization
 6. Implement pagination and database indexes
 7. Set up CI/CD pipeline
 8. Add caching layer (Redis)
 
-**Phase 3: Important (Week 5-6)**
+**Phase 3: Important **
 9. Comprehensive testing (increase coverage)
 10. API documentation (Swagger)
 11. Load testing and performance optimization
 12. Security audit
 
-**Phase 4: Nice to Have (Week 7+)**
+**Phase 4: Nice to Have **
 13. Advanced monitoring and alerting
 14. CDN for static assets
 15. Advanced deployment strategies
 
----
+------------
 
-## Question 2: Daily Automated Population - Solution & Architecture
+# Question 2: Daily Automated Population - Solution & Architecture
 
 ### Current Situation
 - Data team delivers new files daily to S3 bucket
