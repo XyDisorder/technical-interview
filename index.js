@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const { Op } = require('sequelize');
 const db = require('./models');
 
 const app = express();
@@ -22,6 +23,44 @@ app.post('/api/games', (req, res) => {
       console.log('***There was an error creating a game', JSON.stringify(err));
       return res.status(400).send(err);
     });
+});
+
+app.post('/api/games/search', async (req, res) => {
+  const { name, platform } = req.body;
+
+  if (!name && !platform) {
+    console.log('***No search parameters provided***');
+    return db.Game.findAll()
+      .then((games) => res.send(games))
+      .catch((err) => {
+        console.log('***There was an error searching for games', JSON.stringify(err));
+        return res.status(400).send(err);
+      });
+  }
+
+  const whereClause = {};
+  if (name) {
+    whereClause.name = {
+      [Op.like]: `%${name}%`,
+    };
+  }
+  if (platform) {
+    whereClause.platform = platform;
+  }
+
+  try {
+    const searchedGames = await db.Game.findAll({ where: whereClause });
+
+    if (!searchedGames.length) {
+      console.log('***No games found***');
+      return res.status(204).send([]);
+    }
+
+    return res.send(searchedGames);
+  } catch (err) {
+    console.log('***There was an error searching for games', JSON.stringify(err));
+    return res.status(400).send(err);
+  }
 });
 
 app.delete('/api/games/:id', (req, res) => {

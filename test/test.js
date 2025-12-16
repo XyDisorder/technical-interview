@@ -37,6 +37,69 @@ describe('POST /api/games', () => {
 });
 
 /**
+ * Testing search games endpoint
+ */
+describe('POST /api/games/search', () => {
+  it('respond with 200 and a list of games', (done) => {
+    request(app)
+      .post('/api/games/search')
+      .send({ name: 'Test App', platform: 'ios' })
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .end((err, result) => {
+        if (err) return done(err);
+        assert.strictEqual(result.body.length, 1);
+        assert.strictEqual(result.body[0].name, 'Test App');
+        return done();
+      });
+  });
+
+  it('return all games if no search parameters are provided', (done) => {
+    request(app)
+      .post('/api/games/search')
+      .send({})
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .end((err, result) => {
+        if (err) return done(err);
+        assert.strictEqual(result.body.length, 1);
+        assert.strictEqual(result.body[0].name, 'Test App');
+        return done();
+      });
+  });
+
+  it('return games with a partial match on the name', (done) => {
+    request(app)
+      .post('/api/games/search')
+      .send({ name: 'Test' })
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .end((err, result) => {
+        if (err) return done(err);
+        assert.strictEqual(result.body.length, 1);
+        assert.strictEqual(result.body[0].name, 'Test App');
+        return done();
+      });
+  });
+
+  it('return no content if no games are found', (done) => {
+    request(app)
+      .post('/api/games/search')
+      .send({ name: 'Test', platform: 'android' })
+      .set('Accept', 'application/json')
+      .expect(204)
+      .end((err, result) => {
+        if (err) return done(err);
+        assert.strictEqual(result.status, 204);
+        return done();
+      });
+  });
+});
+
+/**
  * Testing get all games endpoint
  */
 describe('GET /api/games', () => {
