@@ -1,6 +1,15 @@
 const request = require('supertest');
 const assert = require('assert');
+const db = require('../models');
 const app = require('../index');
+
+// Clean database before all tests to ensure isolation
+before((done) => {
+  db.sequelize.sync({ force: false })
+    .then(() => db.Game.destroy({ where: {}, force: true }))
+    .then(() => done())
+    .catch(done);
+});
 
 /**
  * Testing create game endpoint
@@ -127,6 +136,21 @@ describe('GET /api/games', () => {
  * Testing update game endpoint
  */
 describe('PUT /api/games/1', () => {
+  before((done) => {
+    // Ensure game with id 1 exists
+    db.Game.findOrCreate({
+      where: { id: 1 },
+      defaults: {
+        publisherId: '1234567890',
+        name: 'Test App',
+        platform: 'ios',
+        storeId: '1234',
+        bundleId: 'test.bundle.id',
+        appVersion: '1.0.0',
+        isPublished: true,
+      },
+    }).then(() => done()).catch(done);
+  });
   const data = {
     id: 1,
     publisherId: '999000999',
@@ -159,9 +183,24 @@ describe('PUT /api/games/1', () => {
 });
 
 /**
- * Testing update game endpoint
+ * Testing delete game endpoint
  */
 describe('DELETE /api/games/1', () => {
+  before((done) => {
+    // Ensure game with id 1 exists
+    db.Game.findOrCreate({
+      where: { id: 1 },
+      defaults: {
+        publisherId: '1234567890',
+        name: 'Test App',
+        platform: 'ios',
+        storeId: '1234',
+        bundleId: 'test.bundle.id',
+        appVersion: '1.0.0',
+        isPublished: true,
+      },
+    }).then(() => done()).catch(done);
+  });
   it('respond with 200', (done) => {
     request(app)
       .delete('/api/games/1')
@@ -179,6 +218,13 @@ describe('DELETE /api/games/1', () => {
  * Testing get all games endpoint
  */
 describe('GET /api/games', () => {
+  before((done) => {
+    // Clean database before this test
+    db.Game.destroy({ where: {}, force: true })
+      .then(() => done())
+      .catch(done);
+  });
+
   it('respond with json containing no games', (done) => {
     request(app)
       .get('/api/games')
