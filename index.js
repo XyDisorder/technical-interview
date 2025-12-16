@@ -28,7 +28,7 @@ app.post('/api/games', validateGame, (req, res, next) => {
 app.post('/api/games/search', validateSearch, async (req, res, next) => {
   const { name, platform } = req.body;
 
-  if (!name && (!platform || platform === '' || platform === 'all')) {
+  if (!name && !platform) {
     console.log('***No search parameters provided***');
     return db.Game.findAll()
       .then((games) => res.send(games))
